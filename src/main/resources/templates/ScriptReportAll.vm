@@ -1,0 +1,152 @@
+function checkGetreportall()
+{
+    if (/^\d{4}-\d{2}-\d{2}$/.test(AJS.$("#startDate").val()) == false) {
+        getMainErrorDialog(incorStartLbl).show();
+        return false;
+    }
+
+    if (/^\d{4}-\d{2}-\d{2}$/.test(AJS.$("#endDate").val()) == false) {
+        getMainErrorDialog(incorEndLbl).show();
+        return false;
+    }
+
+    return true;
+}
+
+/*
+ * CSV report for all.
+ */
+function getcsvreportall(event, baseUrl)
+{
+    event.preventDefault();
+    var url = baseUrl + '/rest/regerws/1.0/itemaction/allcsvreport?' + AJS.$("#searchform").serialize();
+    location.href = url;
+}
+
+function format(str, col) {
+    col = typeof col === 'object' ? col : Array.prototype.slice.call(arguments, 1);
+
+    return str.replace(/\{\{|\}\}|\{(\w+)\}/g, function (m, n) {
+        if (m == "{{") { return "{"; }
+        if (m == "}}") { return "}"; }
+        return col[n];
+    });
+}
+
+function txtChange() {
+    AJS.$('#chText').text(format(hrreptxt, AJS.$('#month option:selected').text(), AJS.$('#year').val(), minDaySet, AJS.$('#repDate').val()));
+}
+
+function setHrDate(baseUrl, over) {
+    JIRA.SmartAjax.makeRequest({
+         url: baseUrl + "/rest/regerws/1.0/itemaction/sethrdate",
+         type: "POST",
+         dataType: "json",
+         data: {"month": AJS.$('#month').val(), "year": AJS.$('#year').val(), "over": over, "repDate": AJS.$('#repDate').val()},
+         error: function(xhr, ajaxOptions, thrownError) {
+            alert(xhr.responseText);
+         },
+         success: function(result) {
+            if (result["over"] == "over") {
+                workDialog = new AJS.Dialog({
+                    width: 250,
+                    height: 150,
+                    id: "work-dialog",
+                    closeOnOutsideClick: true
+                });
+                workDialog.addPanel('data', existsReport);
+                workDialog.addCancel(rewriteLbl, function(){ addDate(baseUrl); });
+                workDialog.addCancel(closeLbl, function(){ workDialog.hide() }, 'cancel');
+                workDialog.show();
+                return;
+            }
+
+            AJS.$('#hrtable > tbody').empty();
+            AJS.$.each(result["hrDates"], function(index, itemData) {
+                var row = "<tr><td width='50%'>" + itemData.year + " - " + itemData.month + "</td><td width='50%'>" + itemData.hrDate + "</td></tr>";
+                AJS.$('#hrtable tbody').append(row);
+            });
+            workDialog.hide();
+        }
+    });
+}
+
+function addDate(baseUrl) {
+    JIRA.SmartAjax.makeRequest({
+         url: baseUrl + "/rest/regerws/1.0/itemaction/sethrdate",
+         type: "POST",
+         dataType: "json",
+         data: {"month": AJS.$('#month').val(), "year": AJS.$('#year').val(), "over": "true", "endDate1": AJS.$('#endDate1').val()},
+         error: function(xhr, ajaxOptions, thrownError) {
+            alert(xhr.responseText);
+         },
+         success: function(result) {
+            
+            AJS.$('#hrtable > tbody').empty();
+            AJS.$.each(result["hrDates"], function(index, itemData) {
+                var row = "<tr><td width='50%'>" + itemData.year + " - " + itemData.month + "</td><td width='50%'>" + itemData.hrDate + "</td></tr>";
+                AJS.$('#hrtable tbody').append(row);
+            });
+            workDialog.hide();
+        }
+    });
+}
+
+/*
+ * PDF report for all.
+ */
+function getpdfreportall(event, baseUrl)
+{
+    event.preventDefault();
+    var url = baseUrl + '/rest/regerws/1.0/itemaction/allpdfreport?' + AJS.$("#searchform").serialize();
+    location.href = url;
+}
+
+    /*
+     * Search report for all employees.
+     */
+    function getreportall(baseUrl)
+    {
+        if (!checkGetreportall()) {
+            return false;
+        }
+
+        JIRA.SmartAjax.makeRequest({
+            url: baseUrl + "/rest/regerws/1.0/itemaction/allreport",
+            type: "POST",
+            dataType: "json",
+            data: AJS.$("#searchform").serialize(),
+            error: function(xhr, ajaxOptions, thrownError) {
+                getMainErrorDialog(xhr.responseText).show();
+            },
+            beforeSend: function() {
+                openWorkDialog();
+            },
+            complete: function() {
+                closeWorkDialog();
+            },
+            success: function(result) {
+                AJS.$('#data_table > tbody').empty();
+
+                AJS.$.each(result["statMap"], function(index, itemData) {
+                    var mins = itemData.minutes;
+                    var missedHours = Math.floor(mins/60);
+                    var missedMins = (mins%60);
+                    if (missedMins < 10) {
+                        missedMins = "0" + missedMins;
+                    }
+                    var middedTime = missedHours + ":" + missedMins;
+
+                    var trTag;
+                    if (itemData.days > 0 || itemData.minutes > 600) {
+                        trTag = '<tr style="color: red;">';
+                    } else {
+                        trTag = '<tr>';
+                    }
+
+                    var row = trTag + "<td>" + itemData.fullname + "</td><td>" + middedTime + "</td><td>" + itemData.days + "</td></tr>";
+                    AJS.$('#data_table tbody').append(row);
+                });
+            }
+        });
+    }

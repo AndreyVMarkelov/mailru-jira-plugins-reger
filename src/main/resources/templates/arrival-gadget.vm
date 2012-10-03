@@ -1,0 +1,47 @@
+<html>
+    <head>
+        <title>$i18n.getText("arrival.gadget.title")</title>
+        <meta name="decorator" content="general">
+        $webResourceManager.requireResource("jira.webresources:jira-global")
+    </head>
+    <body>
+    <div id="jira">
+        #if ( $view.equals("2") )
+            <div class="error-message">
+                <p>$error</p>
+            </div>
+        #else
+            #if ( $view.equals("0") || $view.equals("1") )
+                <div class="results-wrap">
+                    <table class="grid" border="0" cellpadding="3" cellspacing="0" width="98%">
+                        <tbody>
+                        <tr class=rowHeader>
+                            #foreach ($weekDay in $weekDays)
+                                <td #if ($today.getDate() == $weekDay.getDate()) class="today" #end align="center" width="1%">$header_fmt.format($weekDay)</td>
+                            #end
+                        </tr>
+                        <tr>
+                            #foreach ($weekDay in $weekDays)
+                                #set ($registered = false)
+                                #foreach ($arrival in $arrivals)
+                                    #if ($weekDay.getDate() == $arrival.getDate())
+                                        <td #if ($today.getDate() == $weekDay.getDate()) style="background-color:#CCFFCC;" #end align="center" width="1%">$arrival_fmt.format($arrival)</td>
+                                        #set ($registered = true)
+                                    #end
+                                #end
+
+                                #if ($registered == false)
+                                    <td #if ($today.getDate() == $weekDay.getDate()) style="background-color:#CCFFCC;" #end align="center" width="1%"></td>
+                                #end
+                            #end
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            #else
+                <p>$i18n.getText("arrival.gadget.notgroups")</p>
+            #end
+        #end
+    </body>
+</html>

@@ -1,0 +1,78 @@
+/*
+ * CSV user report.
+ */
+function getcsvreport(event, baseUrl)
+{
+    event.preventDefault();
+    var url = baseUrl + '/rest/regerws/1.0/itemaction/usercsvreport?startDate=' + AJS.$("#startDate").val() + '&endDate=' + AJS.$("#endDate").val();
+    location.href = url;
+}
+
+/*
+ * PDF user report.
+ */
+function getpdfreport(event, baseUrl)
+{
+    event.preventDefault();
+    var url = baseUrl + '/rest/regerws/1.0/itemaction/userpdfreport?startDate=' + AJS.$("#startDate").val() + '&endDate=' + AJS.$("#endDate").val();
+    location.href = url;
+}
+
+    function checkGetreport()
+    {
+        if (/^\d{4}-\d{2}-\d{2}$/.test(AJS.$("#startDate").val()) == false) {
+            getMainErrorDialog(incorStartLbl).show();
+            return false;
+        }
+
+        if (/^\d{4}-\d{2}-\d{2}$/.test(AJS.$("#endDate").val()) == false) {
+            getMainErrorDialog(incorEndLbl).show();
+            return false;
+        }
+
+        return true;
+    }
+
+    /*
+     * Search report for user.
+     */
+    function getreport(baseUrl)
+    {
+        if (!checkGetreport()) {
+            return false;
+        }
+
+        JIRA.SmartAjax.makeRequest({
+            url: baseUrl + "/rest/regerws/1.0/itemaction/userreport",
+            type: "POST",
+            dataType: "json",
+            data: {"startDate": AJS.$("#startDate").val(), "endDate": AJS.$("#endDate").val()},
+            error: function(xhr, ajaxOptions, thrownError) {
+                getMainErrorDialog(xhr.responseText).show();
+            },
+            beforeSend: function() {
+                openWorkDialog();
+            },
+            complete: function() {
+                closeWorkDialog();
+            },
+            success: function(result) {
+                AJS.$('#data_table > tbody').empty();
+                AJS.$.each(result.sgenMap, function(index, itemData) {
+                    var trTag = "<tr style='background-color:" + itemData.daytype + ";'>";
+                    var row = trTag + "<td width='33%'>" + itemData.eachdata + "</td><td width='33%'>" + itemData.arrival + "</td><td width='33%'>" + itemData.missedtime + "</td></tr>";
+                    AJS.$('#data_table tbody').append(row);
+                });
+
+                AJS.$("#totalblok").show();
+                var mins = result.genMap.minutes;
+                var missedHours = Math.floor(mins/60);
+                var missedMins = (mins%60);
+                if (missedMins < 10) {
+                    missedMins = "0" + missedMins;
+                }
+                AJS.$("#dd").html(missedHours + ":" + missedMins);
+                AJS.$("#dd1").html(result.genMap.days);
+            }
+        });
+    }

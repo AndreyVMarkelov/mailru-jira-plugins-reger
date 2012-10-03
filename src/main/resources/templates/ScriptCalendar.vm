@@ -1,0 +1,88 @@
+/*
+ * Save calendar changes.
+ */
+function save_cal(baseUrl)
+{
+    var checked = []
+    var unchecked = []
+    var year = AJS.$("#year :selected").val();
+    var month = AJS.$("#month :selected").val();
+    AJS.$('#day_table >tbody >tr').each(function(i, tr) {
+        var flag = AJS.$(tr).find('td:eq(2) input').is(':checked');
+        if (flag) {
+            checked.push(AJS.$(tr).find('td:eq(0)').html());
+        } else {
+            unchecked.push(AJS.$(tr).find('td:eq(0)').html());
+        }
+    });
+
+    JIRA.SmartAjax.makeRequest({
+        url: baseUrl + "/rest/regerws/1.0/itemaction/savecalendar",
+        type: "POST",
+        dataType: "json",
+        data: {"checked": checked, "unchecked": unchecked, "year": year, "month": month},
+        error: function(xhr, ajaxOptions, thrownError) {
+            getMainErrorDialog(xhr.responseText).show();
+        },
+        beforeSend: function() {
+            openWorkDialog();
+        },
+        complete: function() {
+            closeWorkDialog();
+        },
+        success: function() {
+            getMainNotifyDialog(saveLbl).show();
+        }
+    });
+}
+
+/*
+ * On change calendar year.
+ */
+function changeYear()
+{
+    AJS.$("#day_table >tbody").empty();
+}
+
+/*
+ * On change calendar month.
+ */
+function changeMonth(baseUrl)
+{
+    var year = AJS.$("#year :selected").val();
+    var month = AJS.$("#month :selected").val();
+    JIRA.SmartAjax.makeRequest({
+        url: baseUrl + "/rest/regerws/1.0/itemaction/getdays",
+        type: "POST",
+        dataType: "json",
+        data: {"year": year, "month": month},
+        error: function(xhr, ajaxOptions, thrownError) {
+            getMainErrorDialog(xhr.responseText).show();
+        },
+        beforeSend: function() {
+            openWorkDialog();
+        },
+        complete: function() {
+            closeWorkDialog();
+        },
+        success: function(result) {
+            AJS.$('#day_table > tbody').empty();
+            AJS.$.each(result, function(index, itemData) {
+                var trPart;
+                if (itemData.holiday != "true") {
+                    trPart = "<tr bgcolor='#ffe7e7'>";
+                } else {
+                    trPart = "<tr>";
+                }
+                var chbPart;
+                if (itemData.dayoff == "true") {
+                    chbPart = '<input type="checkbox" id="chckHead" checked="yes"/>';
+                } else {
+                    chbPart = '<input type="checkbox" id="chckHead"/>';
+                }
+                var row = trPart + "<td width='30%'>" + itemData.day + "</td><td width='30%'>" + itemData.dayofweek + "</td><td width='30%'>" + chbPart + "</td></tr>";
+                AJS.$('#day_table tbody').append(row);
+           });
+       }
+    });
+}

@@ -1,0 +1,23 @@
+<html>
+    <head>
+        <title>$i18n.getText("arrival.report")</title>
+        <meta name="decorator" content="atl.general"/>
+        $webResourceManager.requireResource("jira.webresources:global-static")
+        $webResourceManager.requireResource("jira.webresources:jira-global")
+        $webResourceManager.requireResource("com.atlassian.auiplugin:ajs")
+    </head>
+    <body class="aui">
+        <ul>
+            #if ($isHR == "true")
+                <li><a href="$baseUrl/plugins/servlet/reger/itemrenderer?action=reportAll"><b>$i18n.getText("arrival.report.all")</b></a></li>
+                <li><a href="$baseUrl/plugins/servlet/reger/itemrenderer?action=calendar"><b>$i18n.getText("arrival.calendar")</b></a></li>
+            #end
+
+            #if ($isEmployee == "true")
+                <li><a href="$baseUrl/plugins/servlet/reger/itemrenderer?action=reportUser"><b>$i18n.getText("arrival.report.user")</b></a></li>
+                <li><a href="$baseUrl//plugins/servlet/reger/itemrenderer?action=register"><b>$i18n.getText("arrival.user.register.user")</b></a></li>
+                <li><a href="$baseUrl/plugins/servlet/reger/itemrenderer?action=delays"><b>$i18n.getText("arrival.user.lates")</b></a></li>
+            #end
+        </ul>
+    </body>
+</html>

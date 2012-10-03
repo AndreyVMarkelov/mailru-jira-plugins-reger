@@ -1,0 +1,128 @@
+<html>
+    <head>
+        <title>$i18n.getText("arrival.user.lates")</title>
+        <meta name="decorator" content="atl.general"/>
+        $webResourceManager.requireResource("jira.webresources:global-static")
+        $webResourceManager.requireResource("jira.webresources:jira-global")
+        $webResourceManager.requireResource("com.atlassian.auiplugin:ajs")
+        $webResourceManager.requireResource("jira.webresources:calendar")
+        $webResourceManager.requireResource("jira.webresources:calendar-$lang")
+    </head>
+    <body class="aui">
+        <table width="100%">
+            <tr>
+                <td width="100%">
+                    <table id="delaytable" name="delaytable" class="grid" width="100%">
+                        <thead>
+                            <tr>
+                                <th>$i18n.getText("arrival.lates.user")</th>
+                                <th>$i18n.getText("arrival.lates.reporter")</th>
+                                <th>$i18n.getText("arrival.lates.date")</th>
+                                <th>$i18n.getText("arrival.lates.time")</th>
+                                <th>$i18n.getText("arrival.lates.reason")</th>
+                                <th>$i18n.getText("arrival.lates.absent")</th>
+                                <th>$i18n.getText("arrival.lates.operation")</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            #foreach($entry in $delays.entrySet())
+                                <tr #if ($entry.value.absent == "true") bgcolor="#ffe7e7" #end>
+                                    <td width='20%'>$entry.value.user</td>
+                                    <td width='20%'>$entry.value.reporter</td>
+                                    <td width='10%'>$entry.value.delayDate</td>
+                                    <td width='10%'>$entry.value.delayTime</td>
+                                    <td width='20%'>$entry.value.comment</td>
+                                    <td width='10%'><input type="checkbox" disabled="disabled" #if ($entry.value.absent == "true") checked="true" #end/></td>
+                                    <td width='10%'><a href="#" onclick="deleteDelay(event, '$baseUrl', deltext, '$entry.key')">$i18n.getText("arrival.lates.delete")</a></td>
+                                </tr>
+                            #end
+                        </tbody>
+                    </table>
+                </td>
+            </tr>
+        </table>
+        <div id="addContent" name="addContent" class="aui">
+            <hr/>
+            <h3 class="jiraformheader">$i18n.getText("arrival.lates.notifyabout")</h3>
+            <form id="late-data" name="late-data" class="aui">
+                <div class="field-group">
+                    <label for="delayuser">$i18n.getText("arrival.lates.userchoose")<span class="aui-icon icon-required"></span></label>
+                    <select form="late-data" id="delayuser" name="delayuser">
+                        #foreach($entry in $userMap.entrySet())
+                            <option value="$entry.key">$entry.value</option>
+                        #end
+                    </select>
+                </div>
+                <div class="field-group">
+                    <label for="delayDate">$i18n.getText("arrival.lates.setdate")<span class="aui-icon icon-required"></span></label>
+                    <input type="text" id="delayDate" name="delayDate"/>
+                    <img id="startDate_trigger" src="$baseUrl/images/icons/cal.gif" width="16" height="16" border="0" alt="Pick a start date"/>
+                </div>
+                <div class="field-group">
+                    <label for="delayTime">$i18n.getText("arrival.lates.settime")<span class="aui-icon icon-required"></span></label>
+                    <input type="text" id="delayTime" name="delayTime"/>
+                </div>
+                <div class="field-group">
+                    <label for="lateReason">$i18n.getText("arrival.lates.latereason")</label>
+                    <textarea id='lateReason' rows="5" cols="20" name='lateReason'></textarea>
+                </div>
+                <div class="field-group">
+                     <input id="switchAbsent" type="checkbox" name="switchAbsent" onclick="absentTrigger();"/>
+                     $i18n.getText("arrival.lates.absent.today")
+                </div>
+                <div class="buttons-container">
+                    <input class="button" type="button" value="$i18n.getText('arrival.lates.register')" id="warn-late" onclick="reglates('$baseUrl', deltext);">
+                </div>
+            </form>
+        </div>
+        <script language="javascript">
+            var deltext = '$i18n.getText("arrival.lates.delete")';
+            var options, a;
+
+            AJS.$(document).ready(function() {
+                AJS.$(window).bind('beforeunload', function() {
+                    return null;
+                });
+
+                AJS.$("#late-data").submit(function() {
+                    AJS.$(window).unbind("beforeunload");
+                });
+
+                options = {
+                    serviceUrl: '$baseUrl/rest/regerws/1.0/itemaction/listusers',
+                    onSelect: function(data, value) {
+                        AJS.$("#userinput").val(value);
+                    }
+                };
+                a = AJS.$('#userinput').autocomplete(options);
+            });
+
+            Calendar.setup({
+                firstDay : 0,
+                inputField : 'delayDate',
+                button : 'startDate_trigger',
+                align : 'Br',
+                singleClick : true,
+                useISO8601WeekNumbers : false,
+                ifFormat : '%Y-%m-%d'
+            });
+
+            AJS.$("#delayDate").val("$delayDateDefault");
+            AJS.$("#delayTime").val("11:00");
+
+            var infoLbl = '$i18n.getText("arrival.gadget.register.information")';
+            var errorLbl = '$i18n.getText("arrival.gadget.register.error")';
+            var closeLbl = '$i18n.getText("common.words.close")';
+            var loadLbl = '$i18n.getText("common.words.loading")';
+
+            var incorRegionLbl = '$i18n.getText("common.words.incor.region")';
+            var incorTimeLbl = '$i18n.getText("common.words.incor.time")';
+            var prevDayLbl = '$i18n.getText("common.words.prevToday")';
+            var incorStartLbl = '$i18n.getText("common.words.incor.start")';
+            var usersetLbl = '$i18n.getText("common.words.usermustbeset")';
+            var existLbl = '$i18n.getText("common.words.delayexist")';
+            #include("templates/ScriptDialogs.vm")
+            #include("templates/ScriptDelay.vm")
+        </script>
+    </body>
+</html>

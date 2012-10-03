@@ -1,0 +1,131 @@
+    function checkLatesForm()
+    {
+        if (AJS.$("#delayuser :selected").val() == "")
+        {
+            getMainErrorDialog(usersetLbl).show();
+            return false;
+        }
+
+        if (/^\d{4}-\d{2}-\d{2}$/.test(AJS.$("#delayDate").val()) == false) {
+            getMainErrorDialog(incorStartLbl).show();
+            return false;
+        }
+
+        if (AJS.$("#delayDate").val() < AJS.$("#today").val()) {
+            getMainErrorDialog(prevDayLbl).show();
+            return false;
+        }
+
+        if (AJS.$("#delayTime").val() && /^\d{2}:\d{2}$/.test(AJS.$("#delayTime").val()) == false) {
+            getMainErrorDialog(incorTimeLbl).show();
+            return false;
+        }
+
+        if (AJS.$("#delayTime").val() && (AJS.$("#delayTime").val() < "10:00" || AJS.$("#delayTime").val() > "19:00")) {
+            getMainErrorDialog(incorRegionLbl).show();
+            return false;
+        }
+
+        return true;
+    }
+
+    function absentTrigger()
+    {
+        if (AJS.$("#switchAbsent").attr('checked')) {
+            AJS.$("#delayTime").attr('disabled','disabled');
+        } else {
+            AJS.$("#delayTime").removeAttr('disabled');
+        }
+    }
+
+    /*
+     * Register delay.
+     */
+    function reglates(baseUrl, deltext)
+    {
+        if (!checkLatesForm()) {
+            return false;
+        }
+
+        JIRA.SmartAjax.makeRequest({
+            url: baseUrl + "/rest/regerws/1.0/itemaction/registerdelay",
+            type: "POST",
+            dataType: "json",
+            data: AJS.$("#late-data").serialize(),
+            error: function(xhr, ajaxOptions, thrownError) {
+                if (xhr.responseText == "dublicatdate") {
+                    getMainErrorDialog(existLbl).show();
+                } else {
+                    getMainErrorDialog(xhr.responseText).show();
+                }
+            },
+            beforeSend: function() {
+                openWorkDialog();
+            },
+            complete: function() {
+                closeWorkDialog();
+            },
+            success: function(result) {
+                AJS.$("#delaytable tbody").empty();
+                AJS.$.each(result, function(index, itemData) {
+                    var rowdesc;
+                    var abs;
+                    if (itemData.absent == "true") {
+                        rowdesc = "<tr bgcolor=\"#ffe7e7\">";
+                        abs = '<input type="checkbox" disabled="disabled" checked="true"/>';
+                    } else {
+                        rowdesc = "<tr>";
+                        abs = '<input type="checkbox" disabled="disabled"/>';
+                    }
+
+                    var row = rowdesc + "<td width='20%'>" + itemData.user + "</td><td width='20%'>" + itemData.reporter + "</td><td width='10%'>" + itemData.delayDate + "</td><td width='10%'>" +
+                        itemData.delayTime + "</td><td width='20%'>" + itemData.comment + "</td><td width='10%'>" + abs + "</td><td width='10%'>" +
+                        "<a href='#' onclick='deleteDelay(event, \"" + baseUrl + "\", \"" + deltext + "\", " + itemData.id + ");'>" + deltext + "</a></td></tr>";
+                    AJS.$('#delaytable tbody').append(row);
+                });
+            }
+        });
+    }
+
+    /*
+     * Delete delay.
+     */
+    function deleteDelay(event, baseUrl, deltext, id)
+    {
+        event.preventDefault();
+
+        JIRA.SmartAjax.makeRequest({
+            url: baseUrl + "/rest/regerws/1.0/itemaction/deletedelay",
+            type: "POST",
+            dataType: "json",
+            data: {"delayId": id},
+            error: function(xhr, ajaxOptions, thrownError) {
+                getMainErrorDialog(xhr.responseText).show();
+            },
+            beforeSend: function() {
+                openWorkDialog();
+            },
+            complete: function() {
+                closeWorkDialog();
+            },
+            success: function(result) {
+                AJS.$("#delaytable tbody").empty();
+                AJS.$.each(result, function(index, itemData) {
+                    var rowdesc;
+                    var abs;
+                    if (itemData.absent == "true") {
+                        rowdesc = "<tr bgcolor=\"#ffe7e7\">";
+                        abs = '<input type="checkbox" disabled="disabled" checked="true"/>';
+                    } else {
+                        rowdesc = "<tr>";
+                        abs = '<input type="checkbox" disabled="disabled"/>';
+                    }
+
+                    var row = rowdesc + "<td width='20%'>" + itemData.user + "</td><td width='20%'>" + itemData.reporter + "</td><td width='10%'>" + itemData.delayDate + "</td><td width='10%'>" +
+                        itemData.delayTime + "</td><td width='20%'>" + itemData.comment + "</td><td width='10%'>" + abs + "</td><td width='10%'>" +
+                        "<a href='#' onclick='deleteDelay(event, \"" + baseUrl + "\", \"" + deltext + "\", " + itemData.id + ");'>" + deltext + "</a></td></tr>";
+                    AJS.$('#delaytable tbody').append(row);
+                });
+            }
+        });
+    }

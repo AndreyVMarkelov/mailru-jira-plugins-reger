@@ -1,0 +1,124 @@
+<html>
+    <head>
+        <title>$i18n.getText("arrival.report.user")</title>
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+        <meta name="decorator" content="atl.general"/>
+        $webResourceManager.requireResource("jira.webresources:global-static")
+        $webResourceManager.requireResource("jira.webresources:jira-global")
+        $webResourceManager.requireResource("com.atlassian.auiplugin:ajs")
+        $webResourceManager.requireResource("jira.webresources:calendar")
+        $webResourceManager.requireResource("jira.webresources:calendar-$lang")
+    </head>
+    <body class="aui">
+        <h3 class="jiraformheader">$i18n.getText("arrival.report.user.filters")</h3>
+        <table width="100%" cellpadding="10">
+        <tr>
+        <td width="50%">
+        <form class="aui" id="searchform" name="searchform">
+            <div class="field-group">
+                <label for="startDate">$i18n.getText("arrival.report.user.starttime")<span class="aui-icon icon-required"></span></label>
+                <input type="text" id="startDate" name="startDate"/>
+                <img id="startDate_trigger" src="$baseUrl/images/icons/cal.gif" width="16" height="16" border="0" alt="Pick a start date"/>
+            </div>
+            <div class="field-group">
+                <label for="endDate">$i18n.getText("arrival.report.user.endtime")<span class="aui-icon icon-required"></span></label>
+                <input type="text" id="endDate" name="endDate"/>
+                <img id="endDate_trigger" src="$baseUrl/images/icons/cal.gif" width="16" height="16" border="0" alt="Pick a end date"/>
+            </div>
+            <div class="buttons-container">
+                <div class="buttons">
+                    <input class="button submit" type="button" value='$i18n.getText("arrival.report.user.search")' onclick="getreport('$baseUrl');"/>
+                </div>
+            </div>
+        </form>
+        </td>
+        <td width="50%" valign="top">
+            <h4>$i18n.getText("arrival.report.user.hrdate")</h4>
+            <table width="100%" class="grid">
+            <tbody style="height: auto;">
+            <tr>
+                <td width="50%">$i18n.getText($months.get($hrDate.getMonth())) - $hrDate.getYear()</td>
+                <td width="50%">$hrDate.getHrDate()</td>
+            </tr>
+            </tbody>
+            </table>
+        </td>
+        </tr>
+        </table>
+        <hr/>
+        <div id="totalblok" name="totalblok" style="display: none;">
+            <table width="100%">
+                <tr><td>
+                    <h3 style="margin-left:22px;">$i18n.getText("arrival.report.user.totalmins")&nbsp;<label id="dd" name="dd"></label></h3>
+                </td></tr>
+                <tr><td>
+                    <h3 style="margin-left:22px;">$i18n.getText("arrival.report.user.totaldays")&nbsp;<label id="dd1" name="dd1"></label></h3>
+                </td></tr>
+            </table>
+        </div>
+        <table width="100%">
+            <tr>
+                <td width="95%">
+                    <table id="data_table" name="data_table" class="grid" width="100%">
+                        <thead>
+                            <tr>
+                                <th width='33%' id="date">$i18n.getText("arrival.report.user.column.date")</th>
+                                <th width='33%' id="arr_time">$i18n.getText("arrival.report.user.column.arrival")</th>
+                                <th width='33%' id="arr_time">$i18n.getText("arrival.report.user.column.middestime")</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                        </tbody>
+                    </table>
+                </td>
+                <td width="5%" align="center" valign="top">
+                    <a href="#" onclick="getcsvreport(event, '$baseUrl')"><b>Excel</b></a><br/>
+                    <a href="#" onclick="getpdfreport(event, '$baseUrl')"><b>PDF</b></a>
+                </td>
+            </tr>
+        </table>
+        <script language="javascript">
+            AJS.$(document).ready(function() {
+                AJS.$(window).bind('beforeunload', function() {
+                    return null;
+                });
+
+                AJS.$("#searchform").submit(function() {
+                    AJS.$(window).unbind("beforeunload");
+                });
+            });
+
+            Calendar.setup({
+                firstDay : 0,
+                inputField : 'startDate',
+                button : 'startDate_trigger',
+                align : 'Br',
+                singleClick : true,
+                useISO8601WeekNumbers : false,
+                ifFormat : '%Y-%m-%d'
+            });
+
+            Calendar.setup({
+                firstDay : 0,
+                inputField : 'endDate',
+                button : 'endDate_trigger',
+                align : 'Br',
+                singleClick : true,
+                useISO8601WeekNumbers : false,
+                ifFormat : '%Y-%m-%d'
+            });
+
+            AJS.$("#startDate").val(#if($hrDate)"$sdf.format($lasthrDate)"#else"$minDate"#end);
+            AJS.$("#endDate").val("$nowDate");
+
+            var infoLbl = '$i18n.getText("arrival.gadget.register.information")';
+            var errorLbl = '$i18n.getText("arrival.gadget.register.error")';
+            var closeLbl = '$i18n.getText("common.words.close")';
+            var loadLbl = '$i18n.getText("common.words.loading")';
+            var incorStartLbl = '$i18n.getText("common.words.incor.start")';
+            var incorEndLbl = '$i18n.getText("common.words.incor.end")';
+            #include("templates/ScriptDialogs.vm")
+            #include("templates/ScriptUserReport.vm")
+        </script>
+    </body>
+</html>

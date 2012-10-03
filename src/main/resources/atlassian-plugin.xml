@@ -1,0 +1,131 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<atlassian-plugin key="${project.groupId}.${project.artifactId}" name="${project.name}" plugins-version="2">
+    <plugin-info>
+        <description>${project.description}</description>
+        <version>${project.version}</version>
+        <vendor name="${project.organization.name}" url="${project.organization.url}"/>
+    </plugin-info>
+
+    <!-- Gadget -->
+    <gadget key="arrival" location="arrival-gadget.xml">
+        <param name="roles-required">use</param>
+    </gadget>
+
+    <!-- Sections -->
+    <web-section key="reger-link-section" name="Arrival registrator reports section" location="reger-links-link" weight="10"/>
+
+    <web-item key="reger-links-link"
+              name="Links on report section"
+              section="system.top.navigation.bar"
+              weight="47">
+        <label key="arrival.report"/>
+        <condition class="ru.mail.jira.plugins.UserIsInGameGroupCondition"/>
+        <link linkId="reger-links-link">/plugins/servlet/reger/itemrenderer?action=list</link>
+    </web-item>
+
+    <web-item key="reg-report-all"
+              name="Report for all users"
+              section="reger-links-link/reger-link-section"
+              weight="47">
+        <label key="arrival.report.all"/>
+        <condition class="ru.mail.jira.plugins.UserIsInHrGroupCondition"/>
+        <link linkId="reg-report-action-all">/plugins/servlet/reger/itemrenderer?action=reportAll</link>
+    </web-item>
+
+    <web-item key="reg-calendar"
+              name="Report for current user"
+              section="reger-links-link/reger-link-section"
+              weight="47">
+        <label key="arrival.calendar"/>
+        <condition class="ru.mail.jira.plugins.UserIsInHrGroupCondition"/>
+        <link linkId="reg-calendar">/plugins/servlet/reger/itemrenderer?action=calendar</link>
+    </web-item>
+
+    <web-item key="reg-report-user"
+              name="Calendar"
+              section="reger-links-link/reger-link-section"
+              weight="47">
+        <label key="arrival.report.user"/>
+        <condition class="ru.mail.jira.plugins.UserIsInGroupCondition"/>
+        <link linkId="reg-report-action-user">/plugins/servlet/reger/itemrenderer?action=reportUser</link>
+    </web-item>
+
+    <web-item key="reg-lates"
+              name="Report for current user"
+              section="reger-links-link/reger-link-section"
+              weight="47">
+        <label key="arrival.user.lates"/>
+        <condition class="ru.mail.jira.plugins.UserIsInGroupCondition"/>
+        <link linkId="reg-lates">/plugins/servlet/reger/itemrenderer?action=delays</link>
+    </web-item>
+
+    <web-item key="reg-register"
+              name="Register current user"
+              section="reger-links-link/reger-link-section"
+              weight="47">
+        <label key="arrival.user.register.user"/>
+        <condition class="ru.mail.jira.plugins.UserIsInGroupCondition"/>
+        <link linkId="reg-lates">/plugins/servlet/reger/itemrenderer?action=register</link>
+    </web-item>
+
+    <web-item key="reger-configuration" name="Reger configuration link on administrators page" section="system.admin/globalsettings" weight="95">
+        <label key="arrival.admin.configuration.item"/>
+        <condition class="com.atlassian.jira.plugin.webfragment.conditions.JiraGlobalPermissionCondition">
+            <param name="permission">admin</param>
+        </condition>
+        <link linkId="arrival-configuration">/secure/ViewRegerConfiguration!default.jspa</link>
+    </web-item>
+
+    <webwork1 key="RegerConfigurationManagement" name="Arrivals configuration management" class="java.lang.Object">
+        <actions>
+            <action name="ru.mail.jira.plugins.ConfigureAction" alias="ViewRegerConfiguration">
+                <view name="input">/templates/configure.vm</view>
+                <view name="success">/templates/configure.vm</view>
+            </action>
+        </actions>
+    </webwork1>
+    <!-- End sections -->
+
+
+    <!-- Rest resources -->
+    <rest key="arrival-rest-resources" path="/regerws" version="1.0">
+        <description>Provides the REST resource for the "reger" plugin.</description>
+    </rest>
+    <!-- End rest -->
+
+
+    <!-- Resources -->
+    <resource type="i18n" name="i18n" location="atlassian-plugin"/>
+    <resource type="download" location="/images/mru-thumb.gif" name="mru-thumb.gif">
+        <param name="content-type" value="image/gif"/>
+    </resource>
+
+    <web-resource key="arrival-context" name="arrival-context" >
+        <transformation extension="js">
+            <transformer key="jsI18n"/>
+        </transformation>
+        <context>jira.general</context>
+        <resource type="download" name="arrival-context.js" location="/script/arrival-context.js"/>
+        <resource type="download" name="arrival-context.css" location="/script/arrival-context.css"/>
+    </web-resource>
+    <!-- End resources -->
+
+    <!-- component imports -->
+    <component key="reger-config" name="Plugin configuration" class="ru.mail.jira.plugins.ConfigurationManagerImpl"/>
+
+    <component-import key="pluginSettingsFactory">
+        <interface>com.atlassian.sal.api.pluginsettings.PluginSettingsFactory</interface>
+    </component-import>
+    <component-import key="applicationProperties">
+        <interface>com.atlassian.sal.api.ApplicationProperties</interface>
+    </component-import>
+    <component-import key="renderer" interface="com.atlassian.templaterenderer.velocity.one.six.VelocityTemplateRenderer" />
+    <!-- End imports -->
+
+    <!-- Servlets -->
+    <servlet key="item-renderer" class="ru.mail.jira.plugins.ItemRenderer">
+        <url-pattern>/reger/itemrenderer</url-pattern>
+    </servlet>
+    <!-- End servlets -->
+</atlassian-plugin>

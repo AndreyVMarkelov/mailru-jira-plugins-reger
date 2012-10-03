@@ -1,0 +1,60 @@
+var workDialog = null;
+
+function openWorkDialog() {
+    if (workDialog) {
+        workDialog.show();
+    } else {
+        workDialog = new AJS.Dialog({
+            width: 200,
+            height: 50,
+            id: "work-dialog",
+            closeOnOutsideClick: true
+        });
+        workDialog.addPanel("load_panel", "<html><body><center>" + loadLbl + "</center></body></html>");
+        workDialog.show();
+    }
+}
+
+function closeWorkDialog() {
+    if (workDialog) {
+        workDialog.hide();
+    }
+}
+
+function getMainErrorDialog(bodyText)
+{
+    var mainErrorDialog = new AJS.Dialog({
+        width:400,
+        height:200,
+        id:"arrival-error-dialog",
+        closeOnOutsideClick: true
+    });
+
+    mainErrorDialog.addHeader(errorLbl);
+    mainErrorDialog.addPanel("ErrorMainPanel", '' +
+        '<html><body><div class="error-message" style="background: no-repeat scroll 10px 10px #FFCCCC; border: 1px solid #CC0000; padding: 10px 10px 10px 30px;">' +
+        bodyText
+        + '</div></div></body></html>',
+        "error-register-panel-body");
+    mainErrorDialog.addCancel(closeLbl, function(){ mainErrorDialog.hide() }, 'cancel');
+    return mainErrorDialog;
+}
+
+function getMainNotifyDialog(bodyText)
+{
+    var mainNotifyDialog = new AJS.Dialog({
+        width:400,
+        height:150,
+        id:"arrival-error-dialog",
+        closeOnOutsideClick: true
+    });
+
+    mainNotifyDialog.addHeader(infoLbl);
+    mainNotifyDialog.addPanel("ErrorMainPanel", '' +
+        '<html><body><div class="error-message" style="background: no-repeat scroll 10px 10px; border: 1px solid #0b7911; padding: 10px 10px 10px 30px;">' +
+        bodyText
+        + '</div></div></body></html>',
+        "error-register-panel-body");
+    mainNotifyDialog.addCancel(closeLbl, function() { mainNotifyDialog.hide() }, 'cancel');
+    return mainNotifyDialog;
+}

@@ -1,0 +1,45 @@
+#registration {
+    margin: 0 5px;
+
+    font-size:16pt;
+    font-family:'times new roman';
+    font-style:italic;
+
+    text-align:center;
+}
+
+.asterisk {
+    font-size:20pt;
+    color: #669933;
+}
+
+.today {
+ background-color:#CCFFCC;
+}
+
+.arrival-time {
+    min-width:50px;
+    width: 50px;
+}
+
+.late-data {
+    padding: 10px;
+    padding: 10px;
+}
+
+.late {
+ background-color: #F0E68C;
+}
+
+.late-over-mark {
+ background-color: #FFA500;
+}
+
+.wontcome {
+ background-color: #FF3030;
+}
+
+
+.registered {
+ background-color: #C1FFC1;
+}

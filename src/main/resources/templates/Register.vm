@@ -1,0 +1,21 @@
+<html>
+    <head>
+        <title>$i18n.getText("arrival.user.register.user")</title>
+        <meta name="decorator" content="atl.general"/>
+        <style type="text/css">
+            dayoff {
+                background: #CC9999;
+                color: black;
+            }
+        </style>
+        $webResourceManager.requireResource("jira.webresources:global-static")
+        $webResourceManager.requireResource("jira.webresources:jira-global")
+    </head>
+    <body class="aui">
+        #if(! $error)
+            <h3 class="jiraformheader">$i18n.getText("arrival.register.explain", $formattedTime)</h3>
+        #else
+            <div class="error-message"><p>$error</p></div>
+        #end
+    </body>
+</html>

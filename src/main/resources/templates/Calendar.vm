@@ -1,0 +1,100 @@
+<html>
+    <head>
+        <title>$i18n.getText("arrival.calendar")</title>
+        <meta name="decorator" content="atl.general"/>
+        <style type="text/css">
+            dayoff {
+                background: #CC9999;
+                color: black;
+            }
+        </style>
+        $webResourceManager.requireResource("jira.webresources:global-static")
+        $webResourceManager.requireResource("jira.webresources:jira-global")
+        $webResourceManager.requireResource("com.atlassian.auiplugin:ajs")
+    </head>
+    <body class="aui">
+        <h3 class="jiraformheader">$i18n.getText("arrival.calendar.mainlabel")</h3>
+        <table cellpadding="7">
+            <tr>
+                <td>
+                    <b>$i18n.getText("arrival.calendar.chooseyear")</b>
+                </td>
+                <td>
+                    <select id="year" name="year" class="aui" onchange="changeYear();changeMonth('$baseUrl');">
+                        <option value="2012">2012</option>
+                        <option value="2013">2013</option>
+                        <option value="2014">2014</option>
+                        <option value="2015">2015</option>
+                        <option value="2016">2016</option>
+                        <option value="2017">2017</option>
+                        <option value="2018">2018</option>
+                        <option value="2019">2019</option>
+                        <option value="2020">2020</option>
+                        <option value="2021">2021</option>
+                    </select>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <b>$i18n.getText("arrival.calendar.choosemonth")</b>
+                </td>
+                <td>
+                    <select id="month" name="month" class="aui" onchange="changeMonth('$baseUrl');">
+                        <option value="1">$i18n.getText("arrival.calendar.january")</option>
+                        <option value="2">$i18n.getText("arrival.calendar.febrary")</option>
+                        <option value="3">$i18n.getText("arrival.calendar.march")</option>
+                        <option value="4">$i18n.getText("arrival.calendar.april")</option>
+                        <option value="5">$i18n.getText("arrival.calendar.may")</option>
+                        <option value="6">$i18n.getText("arrival.calendar.june")</option>
+                        <option value="7">$i18n.getText("arrival.calendar.july")</option>
+                        <option value="8">$i18n.getText("arrival.calendar.august")</option>
+                        <option value="9">$i18n.getText("arrival.calendar.september")</option>
+                        <option value="10">$i18n.getText("arrival.calendar.october")</option>
+                        <option value="11">$i18n.getText("arrival.calendar.november")</option>
+                        <option value="12">$i18n.getText("arrival.calendar.december")</option>
+                    </select>
+                </td>
+            </tr>
+        </table>
+        <hr/>
+        <table width="100%">
+            <tr>
+                <td width="90%">
+                    <table id="day_table" name="day_table" class="grid" width="100%">
+                        <thead>
+                            <th>$i18n.getText("arrival.calendar.date")</th>
+                            <th>$i18n.getText("arrival.calendar.dayofmonth")</th>
+                            <th>$i18n.getText("arrival.calendar.workday")</th>
+                        </thead>
+                        <tbody>
+                        #foreach ($day in $dayList.entrySet())
+                            <tr #if ($day.value.holiday != "true") bgcolor="#ffe7e7" #end>
+                                <td width="30%">$day.key</td>
+                                <td width="30%">$day.value.dayofweek</td>
+                                <td width="30%"><input type="checkbox" id="chckHead" #if ($day.value.dayoff == "true") checked="yes" #end/></td>
+                            </tr>
+                        #end
+                        </tbody>
+                    </table>
+                </td>
+                <td width="10%" align="center" valign="top">
+                    <button id="save_cal" name="save_cal" onclick="save_cal('$baseUrl');">$i18n.getText("arrival.calendar.savecalendar")</button>
+                </td>
+            </tr>
+        </table>
+        <script language="javascript">
+            AJS.toInit(function() {
+                AJS.$("#year [value='$year']").attr("selected", "selected");
+                AJS.$("#month [value='$month']").attr("selected", "selected");
+            });
+
+            var infoLbl = '$i18n.getText("arrival.gadget.register.information")';
+            var errorLbl = '$i18n.getText("arrival.gadget.register.error")';
+            var closeLbl = '$i18n.getText("common.words.close")';
+            var loadLbl = '$i18n.getText("common.words.loading")';
+            var saveLbl = '$i18n.getText("common.words.saved")';
+            #include("templates/ScriptDialogs.vm")
+            #include("templates/ScriptCalendar.vm")
+        </script>
+    </body>
+</html>

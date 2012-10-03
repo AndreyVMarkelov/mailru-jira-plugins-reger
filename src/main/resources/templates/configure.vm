@@ -1,0 +1,123 @@
+<html>
+    <head>
+        <title>$i18n.getText("arrival.admin.configuration.caption")</title>
+        <meta name="decorator" content="admin"/>
+        $webResourceManager.requireResource("com.atlassian.auiplugin:ajs")
+    </head>
+    <body>
+        #if($action.hasAdminPermission())
+        <form class="aui" onsubmit="if (this.submitted) return false; this.submitted = true; return true" name="jiraform" method="post" action="ViewRegerConfiguration.jspa">
+        <table width=100% cellpadding=10 cellspacing=0 border=0>
+            <tr>
+                <td>
+                    <table>
+                        <tbody>
+                        <tr>
+                            <td class="jiraformheader" colspan="2">
+                                $i18n.getText("arrival.admin.configuration.description")
+                            </td>
+                        </tr>
+                        #if ($action.hasAnyErrors())
+                        <tr>
+                            <td colspan="2" class="formErrors">
+                                <div class="errorArea">
+                                    <h4>$action.getText("arrival.admin.configuration.error")</h4>
+                                    <ul>
+                                    #foreach ($error in $action.getErrorMessages())
+                                        <li>$action.getText($error)</li>
+                                    #end
+                                    #foreach ($error in $action.errors)
+                                        <li>$error</li>
+                                    #end
+                                    </ul>
+                                </div>
+                            </td>
+                        </tr>
+                        #end
+                        #if ($saved)
+                        <div class="aui-message closeable shadowed">
+                            <p class="title">
+                                <span class="aui-icon icon-success"></span>
+                                <strong>$action.getText("arrival.admin.configuration.success")</strong>
+                            </p>
+                            <p>$action.getText("arrival.admin.configuration.success.text")</p>
+                        </div>
+                        #end
+                        <tr>
+                            <td>
+                                <div class="field-group">
+                                    <label for="dbHost">$action.getText("arrival.admin.configuration.dbHost")<span class="aui-icon icon-required"></span></label>
+                                    <input type="text" class="text" id="dbHost" name="dbHost" #if ($dbPort) value="$dbHost" #end/>
+                                </div>
+
+                                <div class="field-group">
+                                    <label for="dbPort">$action.getText("arrival.admin.configuration.dbPort")<span class="aui-icon icon-required"></span></label>
+                                    <input type="text" class="text" id="dbPort" name="dbPort" #if ($dbPort) value="$dbPort" #end/>
+                                </div>
+
+                                <div class="field-group">
+                                <label for="database">$action.getText("arrival.admin.configuration.database")<span class="aui-icon icon-required"></span></label>
+                                <input type="text" class="text" id="database" name="database" #if ($database) value="$database" #end/>
+                                </div>
+
+                                <div class="field-group">
+                                <label for="username">$action.getText("arrival.admin.configuration.username")<span class="aui-icon icon-required"></span></label>
+                                <input type="text" class="text" id="username" name="username" #if ($username) value="$username" #end/>
+                                </div>
+
+                                <div class="field-group">
+                                <label for="password">$action.getText("arrival.admin.configuration.password")<span class="aui-icon icon-required"></span></label>
+                                <input type="password" class="text" id="password" name="password" #if ($password) value="$password" #end/>
+                                </div>
+
+                                <div class="field-group">
+                                <label for="mailRecipient">$action.getText("arrival.admin.configuration.mailRecipient")<span class="aui-icon icon-required"></span></label>
+                                <input type="text" class="text" id="mailRecipient" name="mailRecipient" #if ($mailRecipient) value="$mailRecipient" #end/>
+                                </div>
+
+                                <div class="field-group">
+                                <label for="selectedReportGroups">$action.getText("arrival.admin.configuration.selectedGroups")</label>
+                                <select multiple="" size="10" id="selectedReportGroups" name="selectedReportGroups">
+                                    #foreach ($group in $allGroups)
+                                        <option value="$group.getName()"
+                                            #if ($savedReportGroups.contains($group.getName()))
+                                                selected="selected"
+                                            #end
+                                        >$group.getName()</option>
+                                    #end
+                                </select>
+                                </div>
+
+                                <div class="field-group">
+                                <label for="selectedReportGroups">$action.getText("arrival.admin.configuration.selectedReportGroups")</label>
+                                <select multiple="" size="10" id="selectedHrReportGroups" name="selectedHrReportGroups">
+                                    #foreach ($group in $allGroups)
+                                        <option value="$group.getName()"
+                                            #if ($savedHrReportGroups.contains($group.getName()))
+                                                selected="selected"
+                                            #end
+                                        >$group.getName()</option>
+                                    #end
+                                </select>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td colspan="2">
+                                <div class="buttons-container"><div class="buttons">
+                                    <input class="button submit" type="submit" name="add" value="$action.getText("common.words.save")" accesskey="S" title="Press Alt+Shift+S to submit form"/>
+                                    <input class="button submit" id="cancelButton" type="button" accesskey="`" title="Cancel (Alt+Shift + `)" name="Cancel" value="$action.getText("common.words.cancel")" onclick="location.href='$baseUrl/secure/AdminSummary.jspa'"/>
+                                </div></div>
+                            </td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </td>
+            </tr>
+        </table>
+        </form>
+        #else
+            <div class="errorArea">Only "jira-administrators" can have access to this page.</div>
+        #end
+    </body>
+</html>

@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<Module>
+    <ModulePrefs title="__MSG_arrival.gadget.title__"
+                 directory_title="__MSG_arrival.gadget.title__"
+                 description="__MSG_arrival.gadget.description__"
+                 author="Andrey Markelov"
+                 author_affiliation="Mail.Ru"
+                 author_location="Moscow, Russia"
+                 author_email="a.markelov@corp.mail.ru"
+                 thumbnail='#staticResourceUrl("ru.mail.jira.plugins.reger:arrival", "mru-thumb.gif")'>
+        <Require feature="setprefs"/>
+        <Require feature="settitle"/>
+        <Require feature="views"/>
+        <Require feature="oauthpopup"/>
+        <Require feature="dynamic-height"/>
+        <Optional feature="atlassian.util"/>
+        <Optional feature="auth-refresh"/>
+        <Optional feature="gadget-directory">
+            <Param name="categories">Other</Param>
+        </Optional>
+        #oauth
+        #supportedLocales("gadget.common,arrival.gadget")
+        #supportLocales
+    </ModulePrefs>
+    <Content type="html">
+        <![CDATA[
+            #requireResource("jira.webresources:global-static")
+            #requireResource("com.atlassian.gadgets.publisher:ajs-gadgets")
+            #requireResource("com.atlassian.jira.gadgets:common")
+            #includeResources()
+
+            <script type="text/javascript">
+                var gadget = AJS.Gadget({
+                    baseUrl: "__ATLASSIAN_BASE_URL__",
+
+                    view: {
+                        onResizeReload: true,
+                        onResizeAdjustHeight: true,
+                        template: function(args) {
+                            var gadget = this;
+                            gadget.getView().html(args.restresult.html);
+                            gadget.resize();
+                        },
+
+                        args: [{
+                            key: "restresult",
+                            ajaxOptions: "/rest/regerws/1.0/arrival-mark/arrivals"
+                        }]
+                    }
+                });
+            </script>
+        ]]>
+    </Content>
+</Module>
