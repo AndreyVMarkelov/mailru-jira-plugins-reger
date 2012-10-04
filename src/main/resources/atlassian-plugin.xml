@@ -127,5 +127,8 @@
     <servlet key="item-renderer" class="ru.mail.jira.plugins.ItemRenderer">
         <url-pattern>/reger/itemrenderer</url-pattern>
     </servlet>
+    <servlet key="checker" class="ru.mail.jira.plugins.ChekerServlet">
+        <url-pattern>/reger/checker</url-pattern>
+    </servlet>
     <!-- End servlets -->
 </atlassian-plugin>

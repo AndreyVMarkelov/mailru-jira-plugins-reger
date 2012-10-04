@@ -1,39 +1,20 @@
 var arrivalDialog = null;
-var ajax = null;
-
-function getAjax()
-{
-    if (window.ActiveXObject) {
-        return new ActiveXObject("Microsoft.XMLHTTP");
-    }
-    else if (window.XMLHttpRequest) {
-        return new XMLHttpRequest();
-    } else {
-        getErrorDialog("Browser does not support AJAX.");
-        return null;
-    }
-}
 
 function checkRegistered()
 {
-    ajax = getAjax();
-    if (ajax != null) {
-        var req = AJS.params.baseURL + "/rest/regerws/1.0/arrival-mark/check-arrival";
-        ajax.open("GET", req, true);
-        ajax.send(null);
-        ajax.onreadystatechange = function() {
-            if(ajax.readyState==4) {
-                var myObject = eval('(' + ajax.responseText + ')');
-                if (myObject.status == 0 || myObject.status == 3) {
-                    // nothing - it's Ok
-                } else if (myObject.status == 2) {
-                    getErrorDialog(myObject.error).show();
-                } else {
-                    arrivalDialog.show();
-                }
+    jQuery.getJSON(
+        AJS.params.baseURL + "/plugins/servlet/reger/checker",
+        {},
+        function(json) {
+            if (json.status == 0 || json.status == 3 || json.status == 4) {
+                // nothing - it's Ok
+            } else if (json.status == 2) {
+                getErrorDialog(json.error).show();
+            } else {
+                arrivalDialog.show();
             }
         }
-    }
+    );
 }
 
 function countdown(secondsValue, callback)
@@ -55,45 +36,50 @@ function countdown(secondsValue, callback)
 
 function notregisterArrival()
 {
-    ajax = getAjax();
-    if (ajax != null) {
-        var req = AJS.params.baseURL + "/rest/regerws/1.0/arrival-mark/notregister";
-        ajax.open("POST", req, true);
-        ajax.send(null);
-        ajax.onreadystatechange = function() {
-            if(ajax.readyState==4) {
-                arrivalDialog.hide();
-                var myObject = eval('(' + ajax.responseText + ')');
-                if (myObject.status == 1) {
-                    getErrorDialog(myObject.error).show();
-                }
+    jQuery.ajax({
+        url: AJS.params.baseURL + "/plugins/servlet/reger/checker",
+        dataType : "json",
+        type: "POST",
+        data: {"type": "cancel"}, 
+        success: function(data, textStatus) {
+            arrivalDialog.hide();
+            if (data.status == 1) {
+                getErrorDialog(myObject.error).show();
+            } else if (data.status == 4) {
+                getErrorDialog("Cancel is not performed because is not logged!!").show();
+                window.location = AJS.params.baseURL;
             }
+        },
+        error: function() {
+            alert("error");
         }
-    }
+    });
 }
 
 function registerArrival()
 {
-    ajax = getAjax();
-    if (ajax != null) {
-        var req = AJS.params.baseURL + "/rest/regerws/1.0/arrival-mark/register";
-        ajax.open("POST", req, true);
-        ajax.send(null);
-        ajax.onreadystatechange = function() {
-            if(ajax.readyState==4) {
-                arrivalDialog.hide();
-                var myObject = eval('(' + ajax.responseText + ')');
-
-                if (myObject.status == 1) {
-                    getErrorDialog(myObject.error).show();
-                } else {
-                    popup = getNotifyDialog(myObject.formattedDate);
-                    popup.show();
-                    countdown(8, function(){ popup.hide() });
-                }
+    jQuery.ajax({
+        url: AJS.params.baseURL + "/plugins/servlet/reger/checker",
+        dataType : "json",
+        type: "POST",
+        data: {"type": "apply"}, 
+        success: function(data, textStatus) {
+            arrivalDialog.hide();
+            if (data.status == 1) {
+                getErrorDialog(data.error).show();
+            } else if (data.status == 4) {
+                getErrorDialog("User is not registered because is not logged!").show();
+                window.location = AJS.params.baseURL;
+            } else {
+                popup = getNotifyDialog(data.formattedDate);
+                popup.show();
+                countdown(8, function(){ popup.hide() });
             }
+        },
+        error: function() {
+            alert("error");
         }
-    }
+    });
 }
 
 function initArrivalDialog()
