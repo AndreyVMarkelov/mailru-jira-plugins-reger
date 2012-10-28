@@ -87,14 +87,14 @@ public class ArrivalMark
                 if (timePair.isTimeOn() || timePair.isCTime())
                 {
                     params.put("arrivals", reg.getWeekReport(user.getName()));
-                    params.put("header_fmt", new SimpleDateFormat("d/MMM [EEE]"));
+                    params.put("header_fmt", new SimpleDateFormat("d MMM [EEE]"));
                     params.put("arrival_fmt", new SimpleDateFormat("HH:mm:ss"));
                     params.put("view", "0");
                 }
                 else
                 {
                     params.put("arrivals", reg.getWeekReport(user.getName()));
-                    params.put("header_fmt", new SimpleDateFormat("d/MMM [EEE]"));
+                    params.put("header_fmt", new SimpleDateFormat("d MMM [EEE]"));
                     params.put("arrival_fmt", new SimpleDateFormat("HH:mm:ss"));
                     params.put("view", "1");
                 }

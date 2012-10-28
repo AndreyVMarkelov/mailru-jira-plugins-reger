@@ -585,11 +585,17 @@ public class RegistratorSQL
         ResultSet rs = null;
         try
         {
+            Calendar monday = ArrivalUtils.getMonday();
+            Calendar sunday = Calendar.getInstance();
+            sunday.setTimeInMillis(monday.getTimeInMillis());
+            sunday.add(Calendar.DAY_OF_MONTH, 7);
             ArrayList<Timestamp> result = new ArrayList<Timestamp>();
 
             conn = dataSource.getConnection();
             pStmt = conn.prepareStatement(SqlQueries.WEEK_TIMES_QUERY);
             pStmt.setString(1, username);
+            pStmt.setDate(2, new java.sql.Date(monday.getTimeInMillis()));
+            pStmt.setDate(3, new java.sql.Date(sunday.getTimeInMillis()));
             rs = pStmt.executeQuery();
             while (rs.next())
             {
