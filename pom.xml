@@ -5,7 +5,7 @@
   <artifactId>reger</artifactId>
   <packaging>atlassian-plugin</packaging>
   <name>Arrival Schedule Plugin</name>
-  <version>1.3</version>
+  <version>1.4</version>
   <description>This is Arrival Schedule Plugin for the Operation Department of Mail.ru Games.</description>
   <organization>
     <name>Mail.ru</name>
